@@ -33,3 +33,11 @@ jobs:
         GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }} # 新增這行
         DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }} # 新增這行
       run: python main.py # 執行你的主程式
+
+    - name: Backup TXT to GitHub Artifacts
+      if: always() # 關鍵：這行確保即使 Python 報錯 (例如上傳 Google Drive 失敗)，這一步依然會強制執行！
+      uses: actions/upload-artifact@v4
+      with:
+        name: AI_Daily_Summaries # 在 GitHub 頁面上顯示的壓縮檔名稱
+        path: "*.txt"            # 把所有 txt 檔都抓起來備份
+        retention-days: 7        # 設定這些檔案在 GitHub 上保留 7 天

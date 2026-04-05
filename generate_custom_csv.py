@@ -56,10 +56,17 @@ for item in channel_data:
         if response.get('items'):
             channel_id = response['items'][0]['id']
             real_title = response['items'][0]['snippet']['title']
-            final_list.append({"handle": formatted_handle, "channel_id": channel_id, "title": real_title, "category": item["category"]})
+            
+            # --- 關鍵修改處：將鍵值改為 main.py 預期的名稱 ---
+            final_list.append({
+                "Channel Name": real_title,     # 原本是 "title"
+                "Channel ID": channel_id,       # 原本是 "channel_id"
+                "Description": item["category"], # 原本是 "category"
+                "Keep": "Yes"                   # 新增這個欄位，並預設為 "Yes"
+            })
+            # --------------------------------------------
+            
             print(f"成功: {formatted_handle} -> {real_title}")
-        else:
-            print(f"警告: 找不到 {formatted_handle} 的頻道資訊 (請檢查 Handle 是否正確)")
             
     except Exception as e:
          print(f"處理 @{handle} 時發生錯誤: {e}")

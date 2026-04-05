@@ -43,13 +43,12 @@ def get_all_subscriptions(youtube):
         for item in response.get('items', []):
             channel_title = item['snippet']['title']
             channel_id = item['snippet']['resourceId']['channelId']
-            description = item['snippet']['description']
             
             subscriptions.append({
-                'Channel Name': channel_title,
-                'Channel ID': channel_id,
-                'Description': description,
-                'Keep': '' # 預留一個欄位讓你手動標記是否保留
+                'Channel Name': channel_title,      # 統一用大寫開頭與空格
+                'Channel ID': channel_id,          # 統一用大寫開頭與空格
+                'Description': 'Pending Review',    # 預設文字
+                'Keep': 'Yes'                      # 預設為 Yes，這樣如果你不手動改，小探也會幫你爬
             })
 
         # 檢查是否有下一頁

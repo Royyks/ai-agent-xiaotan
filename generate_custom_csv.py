@@ -7,6 +7,7 @@ from googleapiclient.discovery import build
 load_dotenv()
 api_key = os.environ.get("YOUTUBE_API_KEY")
 
+
 if not api_key:
     print("請確保 .env 檔案中有設定 YOUTUBE_API_KEY")
     exit()
@@ -40,28 +41,25 @@ print("開始向 YouTube 查詢真實的 Channel ID...")
 
 for item in channel_data:
     handle = item["handle"]
+    
+    # 關鍵修正：確保 handle 是以 @ 開頭
+    formatted_handle = handle if handle.startswith('@') else f"@{handle}"
+    
     try:
-        # 使用 forHandle endpoint 查詢頻道資訊
+        # 使用修正後的 formatted_handle
         request = youtube.channels().list(
             part="id,snippet",
-            forHandle=handle
+            forHandle=formatted_handle
         )
         response = request.execute()
         
-        if response['items']:
-            channel_info = response['items'][0]
-            real_id = channel_info['id']
-            real_title = channel_info['snippet']['title']
-            
-            final_list.append({
-                'Channel Name': real_title,
-                'Channel ID': real_id,
-                'Description': item['category'], # 我們把 Description 替換成你的分類
-                'Keep': 'Yes'
-            })
-            print(f"成功: @{handle} -> {real_title} ({real_id})")
+        if response.get('items'):
+            channel_id = response['items'][0]['id']
+            real_title = response['items'][0]['snippet']['title']
+            final_list.append({"handle": formatted_handle, "channel_id": channel_id, "title": real_title, "category": item["category"]})
+            print(f"成功: {formatted_handle} -> {real_title}")
         else:
-            print(f"警告: 找不到 @{handle} 的頻道資訊")
+            print(f"警告: 找不到 {formatted_handle} 的頻道資訊 (請檢查 Handle 是否正確)")
             
     except Exception as e:
          print(f"處理 @{handle} 時發生錯誤: {e}")

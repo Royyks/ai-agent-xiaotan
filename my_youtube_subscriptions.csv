@@ -1,18 +1,18 @@
-Channel Name,Channel ID,Description,Keep
-@ompshek,待轉換,AI/ Tech,Yes
-@darenge2023,待轉換,AI/ Tech,Yes
-@CodeShiba,待轉換,AI/ Tech,Yes
-@cwpeng-course,待轉換,AI/ Tech,Yes
-@catherinelijs,待轉換,AI/ Tech,Yes
-@yologuy,待轉換,AI/ Tech,Yes
-@theavocoder,待轉換,AI/ Tech,Yes
-@hackbearterry,待轉換,AI/ Tech,Yes
-@VolkaEnglish,待轉換,English,Yes
-@philosophizethispodcast,待轉換,English,Yes
-@hubermanlab,待轉換,English,Yes
-@veronikas.languagediaries,待轉換,English,Yes
-@bbcnewschinese,待轉換,English,Yes
-@25y.retirement,待轉換,Finance,Yes
-@ahju,待轉換,Finance,Yes
-@阳阳-b2n,待轉換,Finance,Yes
-@a2ky9,待轉換,Finance,Yes
+﻿handle,channel_id,title,category
+@ompshek,UCnixWoic7ATGI0AZ2LrtJ7Q,阿石OMP,AI/ Tech
+@darenge2023,UCYKEwYNZXiJ20O3eJEgwPbQ,我是大仁哥,AI/ Tech
+@CodeShiba,UCDOlnOIq5EjQt1ikKhs4XZg,CodeShiba 程式柴,AI/ Tech
+@cwpeng-course,UCguZS-y7codLSt6vpkVdnKg,彭彭的課程,AI/ Tech
+@catherinelijs,UCfbNkHkjYUjRGV67vVCOVsQ,Catherine Li,AI/ Tech
+@yologuy,UCZXZcgbA7iajsWdPsAzJ40A,Yolo 街  ,AI/ Tech
+@theavocoder,UC4EWKIKdKiDtAscQ9BIXwUw,Lydia Hallie,AI/ Tech
+@hackbearterry,UC_whOg3XES3Fihic53fvo4Q,Terry Chen 泰瑞,AI/ Tech
+@VolkaEnglish,UCcvjK35lDPZTlkIrrwxpepg,Volka English,English
+@philosophizethispodcast,UCjnpuIGovFFUBLG5BeHzTag,Philosophize This!,English
+@hubermanlab,UC2D2CMWXMOVWx7giW1n3LIg,Andrew Huberman,English
+@veronikas.languagediaries,UCDSfasZ89XVcx2J-MiuQmfA,Veronika's Language Diaries,English
+@bbcnewschinese,UCb3TZ4SD_Ys3j4z0-8o6auA,BBC News 中文,English
+@25y.retirement,UCyckQMYsvusrVFzzB2MKYuw,Henry 財自了,Finance
+@ahju,UCBbTnorwzva0ZIMGW0ttwVA,阿豬 Ah Ju,Finance
+@阳阳-b2n,UCQLcgkiePOvLe-ZYgGn9rMg,阳阳,Finance
+@a2ky9,UCqnmNf4lWmu75dj1yF_6ikw,a2ky9,Finance

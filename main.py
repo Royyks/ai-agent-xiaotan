@@ -86,13 +86,24 @@ def get_recent_videos(channel_id):
         return []
     
 def get_transcript(video_id):
-    """獲取影片字幕，優先嘗試中文"""
+    """增強版：獲取影片字幕，支援自動生成字幕與更多語系"""
     try:
-        # 語言優先順序：繁體中文、簡體中文、英文
-        transcript_list = YouTubeTranscriptApi.get_transcript(video_id, languages=['zh-HK', 'zh-TW', 'zh-CN', 'en'])
-        return " ".join([t['text'] for t in transcript_list])
+        # 先獲取該影片所有可用的字幕清單
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        
+        # 擴充語言優先順序 (加入 zh-Hant, zh-Hans, en-US 等)
+        langs = ['zh-HK', 'zh-TW', 'zh-Hant', 'zh-CN', 'zh-Hans', 'zh', 'en', 'en-US', 'en-GB']
+        
+        try:
+            # 優先尋找清單中的語言 (這會自動包含創作者手動上傳和 YouTube 自動生成的)
+            transcript = transcript_list.find_transcript(langs)
+        except:
+            # 如果上面指定的語言都沒有，就直接隨便抓清單裡的第一個可用字幕
+            transcript = list(transcript_list)[0]
+            
+        return " ".join([t['text'] for t in transcript.fetch()])
     except Exception:
-        # 如果該影片沒有提供字幕，則回傳 None
+        # 當影片完全沒有字幕 (例如 Shorts 短影音或創作者關閉字幕) 時會跳到這裡
         return None
     
 def ai_assistant_analyze(title, transcript):
@@ -165,16 +176,22 @@ def main():
             print(f"  ✨ 發現新影片：{video_title}")
             
             transcript = get_transcript(video_id)
+            
+            # --- 1. 判斷是否有字幕，並決定 analysis 變數的內容 ---
             if transcript:
                 print(f"  🤖 小探正在分析中...")
                 analysis = ai_assistant_analyze(video_title, transcript)
-                # 按照你的需求格式化文本
-                report_content += f"Channel: {channel_name}\n"
-                report_content += f"Title: {video_title}\n"
-                report_content += f"Summary:\n{analysis}\n"
-                report_content += "-"*40 + "\n\n"
             else:
-                print(f"  ❌ 無法提取字幕，略過分析。")
+                print(f"  ❌ 無法提取字幕，略過分析，但仍會記錄。")
+                analysis = "⚠️ 無法提取字幕（可能為 Shorts 或未提供），略過 AI 分析。"
+            
+            # --- 2. 【關鍵修改】：不管有沒有字幕，都將結果寫入 report_content ---
+            # 我順便加了影片的 Link，這樣你在 TXT 檔裡可以直接點擊觀看
+            report_content += f"Channel: {channel_name}\n"
+            report_content += f"Title: {video_title}\n"
+            report_content += f"Link: https://www.youtube.com/watch?v={video_id}\n"
+            report_content += f"Summary:\n{analysis}\n"
+            report_content += "-"*40 + "\n\n"
 
     # 3. 輸出最終結果與上傳
     if report_content:

@@ -1,10 +1,13 @@
 import os
 import pandas as pd
+import json
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from youtube_transcript_api import YouTubeTranscriptApi
 from google import genai
+from google.oauth2 import service_account
+from googleapiclient.http import MediaFileUpload
 
 # --- 1. 初始化與載入設定 ---
 load_dotenv()
@@ -20,6 +23,47 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 
 # 設定 YouTube API 服務
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+
+def upload_to_drive(file_path, file_name):
+    """將生成的 TXT 檔案上傳至 Google Drive"""
+    print(f"☁️ 準備上傳 {file_name} 到 Google Drive...")
+    
+    # 從環境變數讀取 Service Account 的 JSON 字串與資料夾 ID
+    creds_json = os.getenv("GCP_CREDENTIALS")
+    folder_id = os.getenv("DRIVE_FOLDER_ID")
+    
+    if not creds_json or not folder_id:
+        print("❌ 錯誤：找不到 GCP_CREDENTIALS 或 DRIVE_FOLDER_ID，跳過上傳。")
+        return
+
+    try:
+        # 將 JSON 字串轉換為認證物件
+        creds_dict = json.loads(creds_json)
+        credentials = service_account.Credentials.from_service_account_info(
+            creds_dict, 
+            scopes=['https://www.googleapis.com/auth/drive.file']
+        )
+        
+        # 建立 Drive API 服務
+        drive_service = build('drive', 'v3', credentials=credentials)
+        
+        # 設定檔案中繼資料 (上傳檔名與目標資料夾)
+        file_metadata = {
+            'name': file_name,
+            'parents': [folder_id]
+        }
+        
+        # 執行上傳
+        media = MediaFileUpload(file_path, mimetype='text/plain', resumable=True)
+        file = drive_service.files().create(
+            body=file_metadata, 
+            media_body=media, 
+            fields='id'
+        ).execute()
+        
+        print(f"✅ 成功！檔案已上傳至 Google Drive (File ID: {file.get('id')})")
+    except Exception as e:
+        print(f"❌ 上傳 Google Drive 失敗: {e}")
 
 def get_recent_videos(channel_id):
     """獲取特定頻道過去 24 小時內的新影片"""
@@ -57,16 +101,15 @@ def ai_assistant_analyze(title, transcript):
     truncated_transcript = transcript[:10000] 
     
     prompt = f"""
-    你是一位專業的事業助理，名字叫「小探」。你的任務是評估 YouTube 影片對我事業的價值。
-    我的事業專注於：AI 技術、Web App 開發、以及提升個人效率。
-
+    請精簡總結這部 YouTube 影片對我事業（AI 技術、Web App 開發）的價值。
+    
     影片標題：{title}
-    影片字幕內容：{truncated_transcript}
+    影片內容：{truncated_transcript}
 
-    請嚴格依照以下格式回報（請使用繁體中文）：
-    1. 【等級評比】：1-5 星（5星為必看）。
-    2. 【核心簡報】：用 3 個重點總結影片精華。
-    3. 【行動清單】：整理出 3 個對我事業有幫助的具體行動 (Action Items)。
+    請嚴格使用以下格式輸出（全用繁體中文），不要有額外廢話：
+    - 核心總結 1
+    - 核心總結 2
+    - 行動建議：[具體可執行的行動]
     """
 
     try:
@@ -125,17 +168,35 @@ def main():
             if transcript:
                 print(f"  🤖 小探正在分析中...")
                 analysis = ai_assistant_analyze(video_title, transcript)
-                report_content += f"\n### 來自頻道：{channel_name}\n**影片：{video_title}**\n{analysis}\n---\n"
+                # 按照你的需求格式化文本
+                report_content += f"Channel: {channel_name}\n"
+                report_content += f"Title: {video_title}\n"
+                report_content += f"Summary:\n{analysis}\n"
+                report_content += "-"*40 + "\n\n"
             else:
                 print(f"  ❌ 無法提取字幕，略過分析。")
 
-    # 3. 輸出最終結果
+    # 3. 輸出最終結果與上傳
     if report_content:
-        print("\n" + "="*20 + " 今日事業簡報 " + "="*20)
-        print(report_content)
-        # 💡 下一步：在此加入發送 Email 或寫入資料庫的邏輯
+        date_str = datetime.now().strftime('%Y-%m-%d')
+        filename = f"AI_Summary_{date_str}.txt"
+        
+        # 加上文件標題
+        final_text = f"小探今日事業簡報 ({date_str})\n"
+        final_text += "="*40 + "\n\n"
+        final_text += report_content
+        
+        # 將結果寫入本地 TXT 檔
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(final_text)
+            
+        print(f"\n📄 已生成本地文件: {filename}")
+        
+        # 呼叫上傳函數
+        upload_to_drive(filename, filename)
     else:
-        print("\n📭 今天追蹤的頻道沒有任何新更新。")
+        print("\n📭 今天追蹤的頻道沒有任何新更新，不上傳文件。")
+        
 
 if __name__ == "__main__":
     main()

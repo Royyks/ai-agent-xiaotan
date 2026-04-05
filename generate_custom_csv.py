@@ -33,6 +33,17 @@ channel_data = [
     {"handle": "ahju", "category": "Finance"},
     {"handle": "阳阳-b2n", "category": "Finance"},
     {"handle": "a2ky9", "category": "Finance"},
+    {"handle": "ChattyEnglishStudio", "category": "English"},
+    {"handle": "LEP-LearnEnglishPodcast", "category": "English"},
+    {"handle": "SpeakEnglishWithClass", "category": "English"},
+    {"handle": "dep-daily-english-podcast", "category": "English"},
+    {"handle": "kurzgesagt", "category": "English"},
+    {"handle": "VoiceTubeTV", "category": "English"},
+    {"handle": "jforrestenglish", "category": "English"},
+    {"handle": "jpcthk", "category": "AI/ Tech"},
+    {"handle": "BBCNews", "category": "News"},
+    {"handle": "wsj", "category": "News"},
+    {"handle": "letstalk", "category": "English"},
 ]
 
 final_list = []

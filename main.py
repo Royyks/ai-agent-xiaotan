@@ -30,7 +30,7 @@ def upload_to_drive(file_path, file_name):
     print(f"☁️ 準備上傳 {file_name} 到 Google Drive...")
     
     # 從環境變數讀取 Service Account 的 JSON 字串與資料夾 ID
-    token_json_str = os.getenv("GDRIVE_TOKEN")
+    token_json_str = os.getenv("GDRIVE_TOKEN").strip() if os.getenv("GDRIVE_TOKEN") else None
     folder_id = os.getenv("DRIVE_FOLDER_ID")
     
     if not token_json_str or not folder_id:

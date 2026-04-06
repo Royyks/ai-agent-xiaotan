@@ -26,16 +26,22 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
 def upload_to_drive(file_path, file_name):
-    """將生成的 TXT 檔案上傳至 Google Drive"""
+    """將生成的 TXT 檔案以你本人的身分上傳至 Google Drive"""
     print(f"☁️ 準備上傳 {file_name} 到 Google Drive...")
     
-    # 從環境變數讀取 Service Account 的 JSON 字串與資料夾 ID
-    token_json_str = os.getenv("GDRIVE_TOKEN").strip() if os.getenv("GDRIVE_TOKEN") else None
+    # 讀取剛才設定的 GitHub Secret，並清除前後可能的空白或換行
+    token_json_str = os.getenv("GDRIVE_TOKEN")
     folder_id = os.getenv("DRIVE_FOLDER_ID")
     
     if not token_json_str or not folder_id:
         print("❌ 錯誤：找不到 GDRIVE_TOKEN 或 DRIVE_FOLDER_ID，跳過上傳。")
         return
+
+    # --- 加入「照妖鏡」來檢查字串狀態 ---
+    token_json_str = token_json_str.strip() 
+    print(f"🔍 檢查 Token 格式：長度 {len(token_json_str)} 字元")
+    print(f"🔍 Token 開頭：{token_json_str[:10]} ... 結尾：{token_json_str[-10:]}")
+    # ----------------------------------
 
     try:
         # 將 JSON 字串轉換為認證物件

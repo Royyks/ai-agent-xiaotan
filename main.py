@@ -8,6 +8,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from google import genai
 from google.oauth2 import service_account
 from googleapiclient.http import MediaFileUpload
+from google.oauth2.credentials import Credentials
 
 # --- 1. 初始化與載入設定 ---
 load_dotenv()
@@ -29,16 +30,16 @@ def upload_to_drive(file_path, file_name):
     print(f"☁️ 準備上傳 {file_name} 到 Google Drive...")
     
     # 從環境變數讀取 Service Account 的 JSON 字串與資料夾 ID
-    creds_json = os.getenv("GCP_CREDENTIALS")
+    token_json_str = os.getenv("GDRIVE_TOKEN")
     folder_id = os.getenv("DRIVE_FOLDER_ID")
     
-    if not creds_json or not folder_id:
-        print("❌ 錯誤：找不到 GCP_CREDENTIALS 或 DRIVE_FOLDER_ID，跳過上傳。")
+    if not token_json_str or not folder_id:
+        print("❌ 錯誤：找不到 GDRIVE_TOKEN 或 DRIVE_FOLDER_ID，跳過上傳。")
         return
 
     try:
         # 將 JSON 字串轉換為認證物件
-        creds_dict = json.loads(creds_json)
+        creds_dict = json.loads(token_json_str)
         credentials = service_account.Credentials.from_service_account_info(
             creds_dict, 
             scopes=['https://www.googleapis.com/auth/drive.file']
